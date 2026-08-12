@@ -55,7 +55,11 @@ def get_current_user(
 
     firebase_uid = decoded_token["uid"]
     email = decoded_token.get("email")
-    name = decoded_token.get("name")
+    # Firebase only sets "name" if the user has a displayName (e.g. via
+    # Google sign-in or explicit signup code). Email/password signups
+    # often have no name at all, but the `users.name` column is NOT NULL,
+    # so fall back to something derived from the email rather than None.
+    name = decoded_token.get("name") or (email.split("@")[0] if email else "Unknown")
 
     user = db.query(User).filter(User.firebase_uid == firebase_uid).first()
     if user is None:

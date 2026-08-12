@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "./auth/authContext";
 import { loginWithEmail, loginWithGoogle, resetPassword } from "./auth/login";
-import { signUpWithEmail } from "./auth/signup";
+import { sendOtpToEmail, signUpWithEmail } from "./auth/signup";
 
 const initialFormState = {
   username: "",
   email: "",
   password: "",
+  otp: "",
   rememberMe: true,
   forgotEmail: "",
 };
@@ -35,6 +36,7 @@ export default function App() {
   const [toast, setToast] = useState({ show: false, title: "", message: "", type: "success" });
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState({ login: false, signup: false });
+  const [otpState, setOtpState] = useState({ sent: false, sending: false });
   const toastTimer = useRef(null);
 
   useEffect(() => {
@@ -66,7 +68,27 @@ export default function App() {
     setPasswordVisible((current) => ({ ...current, [form]: !current[form] }));
   };
 
-  const resetForm = () => setFormState(initialFormState);
+  const resetForm = () => {
+    setFormState(initialFormState);
+    setOtpState({ sent: false, sending: false });
+  };
+
+  const handleSendOtp = async () => {
+    if (!formState.email) {
+      return showToast("Missing email", "Please enter your email before requesting an OTP.", "error");
+    }
+
+    try {
+      setOtpState((current) => ({ ...current, sending: true }));
+      await sendOtpToEmail(formState.email);
+      setOtpState({ sent: true, sending: false });
+      showToast("OTP sent", "A 6-digit code is on the way to your email.", "success");
+    } catch (err) {
+      setOtpState({ sent: false, sending: false });
+      const message = err?.message || "Could not send the verification code.";
+      showToast("OTP failed", message, "error");
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -75,7 +97,7 @@ export default function App() {
         await loginWithEmail(formState.email, formState.password, formState.rememberMe);
         showToast("Welcome back!", "You are now signed in.", "success");
       } else {
-        await signUpWithEmail(formState.username, formState.email, formState.password);
+        await signUpWithEmail(formState.username, formState.email, formState.password, formState.otp);
         showToast("Account created", "Your new account is ready.", "success");
       }
       resetForm();
@@ -120,16 +142,22 @@ export default function App() {
     <div className="page-shell">
       <div className="bg-wrapper" id="bgWrapper">
         <div className="bg-overlay" />
-        <div className="travel-pin pin-1" title="Paris, France">
-          <span className="pin-pulse" />
+        <div className="bg-sketch-map" aria-hidden="true">
+          <svg viewBox="0 0 1200 820" preserveAspectRatio="xMidYMid meet">
+            <g fill="none" stroke="rgba(100, 95, 115, 0.55)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M780 210c34-30 82-46 118-18 25 19 34 60 20 87-11 20-31 35-42 56-18 34-11 76 13 104 34 39 44 92 8 130-17 17-35 30-55 33-33 6-67-6-92-27-32-27-35-69-25-108 9-36 34-68 32-108-2-42-30-83-42-121-9-30 8-58 31-70 21-11 31-15 34-57z" opacity="0.35"/>
+              <path d="M600 198c-36-18-79-9-112 12-28 18-38 52-34 84 6 46 45 81 87 102 57 28 110 66 134 121 22 50 3 104-31 148-40 51-105 76-169 74-54-2-108-21-152-56-71-55-92-150-60-231 12-32 37-61 63-85 22-20 46-39 69-61 36-34 76-74 126-109 12-9 40-11 79-1Z" opacity="0.32"/>
+              <path d="M330 230c23-39 61-62 101-73 42-12 89-16 131 5 32 16 57 46 56 81-1 41-37 72-70 94-38 24-70 52-98 86-25 31-42 72-63 105-17 27-46 48-77 57-31 10-68 8-92-15-25-24-31-63-23-96 11-48 53-86 82-122 21-25 43-48 53-80z" opacity="0.25"/>
+              <path d="M900 336c39-17 89-13 122 12 28 22 43 59 38 94-7 47-50 82-93 100-39 17-85 24-127 18-50-7-99-35-124-77-26-43-23-102 16-139 37-35 90-41 168-8z" opacity="0.26"/>
+              <path d="M505 298c18 15 33 35 35 59 3 41-22 82-67 96-43 14-91 5-120-28-36-41-39-105-2-147 32-36 92-44 154-26z" opacity="0.26"/>
+              <path d="M770 460c18 18 28 45 16 69-18 36-64 48-103 39-44-11-77-51-74-96 3-40 32-75 71-89 43-15 98 19 90 77Z" opacity="0.22"/>
+              <path d="M200 440c45-23 97-30 146-13 26 9 48 27 69 44 40 35 83 77 120 117 24 27 52 51 84 67 37 18 80 24 119 18-22 32-55 58-92 72-65 24-141 22-205-8-60-28-110-84-133-148-14-40-16-83 6-125 8-16 19-27 36-24l-50-18Z" opacity="0.2"/>
+            </g>
+          </svg>
         </div>
-        <div className="travel-pin pin-2" title="Kyoto, Japan">
-          <span className="pin-pulse" />
-        </div>
-        <div className="travel-pin pin-3" title="Reykjavik, Iceland">
-          <span className="pin-pulse" />
-        </div>
-        <div className="floating-signpost" id="signpost">TRIPS AHEAD ➔</div>
+        <div className="bg-map-pin pin-left" title="Map pin" />
+        <div className="bg-map-pin pin-right" title="Map pin" />
+        <div className="floating-signpost" id="signpost">TRIPS AHEAD →</div>
       </div>
 
       <main className="page-container">
@@ -297,6 +325,35 @@ export default function App() {
                   autoComplete="email"
                 />
               </div>
+
+              <div className="otp-actions-row">
+                <button type="button" className="btn-otp" onClick={handleSendOtp} disabled={otpState.sending}>
+                  {otpState.sending ? "Sending..." : otpState.sent ? "Resend OTP" : "Send OTP"}
+                </button>
+              </div>
+
+              {otpState.sent && (
+                <div className="input-group otp-input-group">
+                  <span className="input-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M7 10v4h10v-4" />
+                      <path d="M9 10V7.5A3 3 0 0 1 12 4.5a3 3 0 0 1 3 3V10" />
+                      <rect x="4" y="10" width="16" height="10" rx="2" />
+                    </svg>
+                  </span>
+                  <input
+                    type="text"
+                    name="otp"
+                    className="form-input"
+                    placeholder="Enter 6-digit OTP"
+                    value={formState.otp}
+                    onChange={handleChange}
+                    maxLength="6"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                  />
+                </div>
+              )}
 
               <div className="input-group">
                 <span className="input-icon" aria-hidden="true">

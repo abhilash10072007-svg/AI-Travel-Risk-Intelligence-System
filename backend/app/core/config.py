@@ -24,6 +24,13 @@ class Settings(BaseSettings):
     # Comma-separated origins allowed to call this API during development
     frontend_origins: str = "http://localhost:3000"
 
+    # Optional SMTP details for email OTP delivery
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
+    smtp_from_email: str = ""
+
     environment: str = "development"
 
     model_config = SettingsConfigDict(env_file=ENV_FILE_PATH, env_file_encoding="utf-8")
