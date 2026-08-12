@@ -1,0 +1,14 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Env & secrets
+.env
+backend/secrets/
+firebase_token.json
+
+# Node (frontend)
+node_modules/
+dist/
+.DS_Store
