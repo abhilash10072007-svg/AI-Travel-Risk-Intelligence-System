@@ -1,3 +1,5 @@
+// → calls Firebase client SDK: createUserWithEmailAndPassword
+
 // Email/password + Google sign-up against Firebase.
 import {
   createUserWithEmailAndPassword,

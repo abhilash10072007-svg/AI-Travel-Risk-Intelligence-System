@@ -8,7 +8,8 @@ async function getAuthHeader() {
   const user = auth.currentUser;
   if (!user) return {};
   const token = await user.getIdToken();
-  return { Authorization: `Bearer ${token}` };
+  const authToken = "Bearer ".concat(token);
+  return { Authorization: authToken };
 }
 
 async function request(path, options = {}) {
@@ -34,7 +35,6 @@ async function request(path, options = {}) {
     throw new Error(detail);
   }
 
-  // /health-style endpoints may return no body
   const contentType = response.headers.get("content-type") || "";
   return contentType.includes("application/json") ? response.json() : null;
 }
@@ -44,7 +44,6 @@ export const apiClient = {
   post: (path, body) => request(path, { method: "POST", body: JSON.stringify(body) }),
 };
 
-// Matches GET /api/auth/me in your FastAPI backend
 export function fetchCurrentUser() {
   return apiClient.get("/api/auth/me");
 }

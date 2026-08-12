@@ -1,3 +1,4 @@
+// → keeps track of logged-in user, exposes getIdToken()
 // React context that tracks the Firebase auth state app-wide
 // and exposes the matching backend user (from /api/auth/me).
 import { createContext, useContext, useEffect, useState } from "react";
