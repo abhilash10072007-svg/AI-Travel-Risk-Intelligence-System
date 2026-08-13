@@ -62,6 +62,19 @@ def get_current_user(
     name = decoded_token.get("name") or (email.split("@")[0] if email else "Unknown")
 
     user = db.query(User).filter(User.firebase_uid == firebase_uid).first()
+
+    if user is None and email:
+        # Same email might already exist under a different firebase_uid
+        # (e.g. testing with multiple sign-in methods). Link it instead
+        # of inserting a duplicate, which would violate the unique
+        # constraint on users.email.
+        existing_by_email = db.query(User).filter(User.email == email).first()
+        if existing_by_email is not None:
+            existing_by_email.firebase_uid = firebase_uid
+            db.commit()
+            db.refresh(existing_by_email)
+            return existing_by_email
+
     if user is None:
         user = User(firebase_uid=firebase_uid, email=email, name=name)
         db.add(user)

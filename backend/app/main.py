@@ -1,9 +1,8 @@
-# → Abhilash (app setup, wiring everything)
-
 """
-FastAPI application entrypoint. Phase 1 scope: app setup, CORS,
-error handling, and the /api/auth/me route against the existing
-Supabase `users` table.
+FastAPI application entrypoint.
+
+Phase 1: app setup, CORS, error handling, /api/auth/me.
+Phase 2: Trip Input API (/api/trips).
 """
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,11 +10,15 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.api import auth
+from app.api import trips
+from app.api import route_segments
+from app.api import risk_assessments
+from app.api import alerts
 
 app = FastAPI(
     title="AI Travel Risk Intelligence System - Backend",
-    description="Phase 1: FastAPI foundation + Firebase authentication + Supabase Postgres.",
-    version="0.1.0",
+    description="FastAPI foundation + Firebase authentication + Supabase Postgres + Trip Input API.",
+    version="0.2.0",
 )
 
 app.add_middleware(
@@ -27,6 +30,10 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(trips.router)
+app.include_router(route_segments.router)
+app.include_router(risk_assessments.router)
+app.include_router(alerts.router)
 
 
 @app.exception_handler(HTTPException)
