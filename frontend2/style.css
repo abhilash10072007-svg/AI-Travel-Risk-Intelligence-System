@@ -1,0 +1,440 @@
+/* ==========================================================================
+   JOURNEY GUARDIAN - Master Stylesheet (Part 1)
+   ========================================================================== */
+
+:root {
+  --brand-purple-dark: #2E0854;
+  --brand-purple-primary: #3B0764;
+  --brand-purple-accent: #6B21A8;
+  --brand-purple-light: #F3E8FF;
+  --primary: #4F46E5;
+  --primary-hover: #4338CA;
+  --primary-dark: #3730A3;
+  --primary-light: #EEF2FF;
+  --primary-gradient: linear-gradient(135deg, #2E0854 0%, #3B0764 50%, #4C1D95 100%);
+
+  --emerald: #10B981;
+  --emerald-dark: #059669;
+  --emerald-bg: #ECFDF5;
+  --emerald-border: #A7F3D0;
+  
+  --amber: #F59E0B;
+  --amber-dark: #D97706;
+  --amber-bg: #FFFBEB;
+  --amber-border: #FDE68A;
+
+  --red: #EF4444;
+  --red-dark: #DC2626;
+  --red-bg: #FEF2F2;
+  --red-border: #FECACA;
+
+  --bg-app: #F8FAFC;
+  --bg-sidebar: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --text-main: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #94A3B8;
+  --border-light: #E2E8F0;
+  --border-card: #F1F5F9;
+
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+  --shadow-md: 0 6px 16px rgba(15, 23, 42, 0.06), 0 2px 4px rgba(15, 23, 42, 0.03);
+  --shadow-lg: 0 12px 30px -4px rgba(15, 23, 42, 0.08), 0 4px 6px -2px rgba(15, 23, 42, 0.03);
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+  --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+.sidebar {
+  width: 250px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid #F1F5F9;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; bottom: 0; left: 0;
+  z-index: 100;
+}
+
+.sidebar-brand {
+  padding: 24px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #1E1B4B;
+}
+
+.brand-title-bold {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #2E0854;
+}
+
+.brand-subtitle {
+  font-size: 8px;
+  font-weight: 600;
+  color: #64748B;
+  margin-top: 3px;
+}
+
+.sidebar-nav {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 13.5px;
+  font-weight: 600;
+  width: 100%;
+}
+
+.nav-item.active {
+  background: #F3E8FF;
+  color: #2E0854;
+  font-weight: 700;
+}
+
+.nav-item.active .nav-icon {
+  color: #2E0854;
+}
+
+.main-wrapper {
+  margin-left: 250px;
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-header {
+  height: 64px;
+  padding: 0 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.page-badge-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-index-tag {
+  background: #2E0854;
+  color: #FFFFFF;
+  font-size: 11.5px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: var(--radius-full);
+}
+
+.page-heading {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.icon-circle-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  position: relative;
+}
+
+.notification-num-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  background: #2E0854;
+  color: #FFFFFF;
+  font-size: 9.5px;
+  font-weight: 800;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #FFFFFF;
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 320px;
+  background: #FFFFFF;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-lg);
+  display: none;
+  flex-direction: column;
+  z-index: 200;
+  overflow: hidden;
+}
+
+.notification-dropdown.show { display: flex; }
+
+.user-profile-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 12px 4px 6px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-full);
+}
+
+.avatar-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #CBD5E1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+}
+
+.screens-container {
+  padding: 10px 36px 40px;
+  flex: 1;
+}
+
+.screen-view {
+  display: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.screen-view.active {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+/* Dashboard Hero */
+.dashboard-hero-panoramic {
+  min-height: 290px;
+  background: url('assets/hero_bg_exact.jpg') no-repeat right center / cover, #FFFFFF;
+  border-radius: var(--radius-xl);
+  padding: 40px 48px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.hero-title-main {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.12;
+}
+
+.hero-title-purple { color: var(--brand-purple-dark); }
+
+.hero-subtitle-main {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin-top: 10px;
+}
+
+/* Capsules Trip Planner */
+.trip-planner-card-exact {
+  background: #FFFFFF;
+  border-radius: 24px;
+  border: 1px solid #F1F5F9;
+  padding: 28px 36px;
+}
+
+.planner-capsules-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 22px;
+}
+
+.capsule-item {
+  flex: 1;
+  height: 58px;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 9999px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #FFFFFF;
+}
+
+.capsule-connector {
+  width: 20px;
+  border-top: 2px dotted #CBD5E1;
+}
+
+.capsule-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.capsule-input, .capsule-select {
+  border: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  width: 100%;
+}
+
+.btn-analyze-full {
+  width: 100%;
+  height: 52px;
+  background: var(--primary-gradient);
+  color: #FFFFFF;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-purple);
+}
+
+/* Feature Cards */
+.feature-cards-grid-exact {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.feature-card-clean {
+  background: #FFFFFF;
+  border: 1px solid #F1F5F9;
+  border-radius: 18px;
+  padding: 22px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.feature-icon-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #F3E8FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand-purple-dark);
+}
+
+.feature-heading {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Map Screen */
+.route-map-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+}
+
+.map-card-container {
+  overflow: visible;
+  position: relative;
+}
+
+.map-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  z-index: 1000;
+  overflow: visible;
+}
+
+.map-view-wrapper {
+  position: relative;
+  height: 480px;
+  background: #E2E8F0;
+}
+
+.leaflet-map-canvas {
+  width: 100%;
+  height: 100%;
+}

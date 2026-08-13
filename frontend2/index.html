@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Journey Guardian - AI Travel Risk Intelligence</title>
+  <meta name="description" content="AI-powered travel risk intelligence platform to help you choose safer routes and better times for every journey." />
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Leaflet CSS & JS for real interactive maps -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-layout">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar" id="appSidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo-wrap">
+          <svg class="brand-logo-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 3L6 8.25V18C6 25.5 11.25 32.25 18 34.5C24.75 32.25 30 25.5 30 18V8.25L18 3Z" stroke="#2E0854" stroke-width="2.5" stroke-linejoin="round"/>
+            <path d="M14 26C14 21 22 21 22 15C22 12.5 19.5 10 18 10" stroke="#6B21A8" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="2 3"/>
+            <circle cx="18" cy="10" r="2.5" fill="#2E0854"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">JOURNEY</div>
+          <div class="brand-title-bold">GUARDIAN</div>
+          <div class="brand-subtitle">AI Travel Risk Intelligence</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-page="page-dashboard">
+          <i data-lucide="home" class="nav-icon"></i>
+          <span class="nav-label">Dashboard</span>
+        </button>
+        <button class="nav-item" data-page="page-time-analysis">
+          <i data-lucide="clock" class="nav-icon"></i>
+          <span class="nav-label">Time Analysis</span>
+        </button>
+        <button class="nav-item" data-page="page-route-map">
+          <i data-lucide="map" class="nav-icon"></i>
+          <span class="nav-label">Route Map</span>
+        </button>
+        <button class="nav-item" data-page="page-offline-center">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+            <line x1="12" y1="11" x2="12" y2="17"/>
+            <line x1="9" y1="14" x2="15" y2="14"/>
+          </svg>
+          <span class="nav-label">Offline Center</span>
+        </button>
+        <button class="nav-item" data-page="page-history">
+          <i data-lucide="calendar" class="nav-icon"></i>
+          <span class="nav-label">History</span>
+        </button>
+        <button class="nav-item" data-page="page-settings">
+          <i data-lucide="settings" class="nav-icon"></i>
+          <span class="nav-label">Settings</span>
+        </button>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-wrapper">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle Navigation">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="page-badge-title" id="headerTitleWrapper">
+            <span class="page-index-tag" id="currentScreenIndex">01</span>
+            <h1 class="page-heading" id="currentScreenHeading">Dashboard</h1>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <!-- Notification Bell with '3' badge -->
+          <div class="notification-wrap">
+            <button class="icon-circle-btn" id="notificationBtn" aria-label="Notifications">
+              <i data-lucide="bell"></i>
+              <span class="notification-num-badge">3</span>
+            </button>
+            
+            <!-- Notification Dropdown -->
+            <div class="notification-dropdown" id="notificationDropdown">
+              <div class="notification-header">
+                <span class="notification-title">Live Alerts & Warnings</span>
+                <span class="notification-count">3 Active</span>
+              </div>
+              <div class="notification-list">
+                <div class="notif-item alert-danger" onclick="navigateToScreen('page-route-map')">
+                  <i data-lucide="alert-triangle" class="notif-icon text-red"></i>
+                  <div class="notif-text">
+                    <strong>Zone C Landslide Warning</strong>
+                    <p>Confirmed road blockage near Anamalai Ghat. Reroute recommended.</p>
+                    <span class="notif-time">5 mins ago</span>
+                  </div>
+                </div>
+                <div class="notif-item alert-warning" onclick="navigateToScreen('page-time-analysis')">
+                  <i data-lucide="cloud-rain" class="notif-icon text-amber"></i>
+                  <div class="notif-text">
+                    <strong>Precipitation Shift</strong>
+                    <p>Heavy rain onset delayed by 30 mins in Zone B.</p>
+                    <span class="notif-time">18 mins ago</span>
+                  </div>
+                </div>
+                <div class="notif-item alert-info" onclick="navigateToScreen('page-time-analysis')">
+                  <i data-lucide="shield-check" class="notif-icon text-indigo"></i>
+                  <div class="notif-text">
+                    <strong>Safe Window Update</strong>
+                    <p>11:00 PM departure is optimal for Coimbatore to Palakkad.</p>
+                    <span class="notif-time">32 mins ago</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- User Profile -->
+          <div class="user-profile-badge">
+            <div class="avatar-circle">
+              <i data-lucide="user" class="avatar-icon"></i>
+            </div>
+            <div class="user-info">
+              <span class="user-name">Traveler</span>
+              <span class="user-role">Welcome back!</span>
+            </div>
+            <i data-lucide="chevron-down" class="user-dropdown-arrow"></i>
+          </div>
+        </div>
+      </header>
+
+      <!-- SCREEN CONTAINER -->
+      <div class="screens-container">
+
+        <!-- SCREEN 01: DASHBOARD -->
+        <section class="screen-view active" id="page-dashboard">
+          <div class="dashboard-hero-panoramic">
+            <div class="hero-text-content">
+              <h1 class="hero-title-main">
+                Plan smart.<br />
+                <span class="hero-title-purple">Travel safe.</span>
+              </h1>
+              <p class="hero-subtitle-main">
+                AI-powered intelligence to help you<br />
+                choose safer routes and better times<br />
+                for every journey.
+              </p>
+            </div>
+          </div>
+
+          <!-- Plan Your Trip Card -->
+          <div class="card trip-planner-card-exact">
+            <div class="card-header-clean">
+              <div class="planner-icon-circle">
+                <i data-lucide="map-pin" class="planner-pin-icon"></i>
+              </div>
+              <div class="planner-header-text">
+                <h3 class="planner-title">Plan Your Trip</h3>
+                <p class="planner-subtitle">Enter your trip details to get AI-powered risk analysis for your route.</p>
+              </div>
+            </div>
+
+            <div class="planner-capsules-container">
+              <div class="capsule-item">
+                <div class="capsule-icon-wrap"><i data-lucide="map-pin" class="capsule-icon"></i></div>
+                <div class="capsule-body">
+                  <span class="capsule-label">Origin</span>
+                  <input type="text" id="originInput" class="capsule-input" value="Coimbatore" />
+                </div>
+                <i data-lucide="chevron-down" class="capsule-chevron"></i>
+              </div>
+              <div class="capsule-connector"></div>
+              <div class="capsule-item">
+                <div class="capsule-icon-wrap"><i data-lucide="map-pin" class="capsule-icon"></i></div>
+                <div class="capsule-body">
+                  <span class="capsule-label">Destination</span>
+                  <input type="text" id="destInput" class="capsule-input" value="Palakkad" />
+                </div>
+                <i data-lucide="chevron-down" class="capsule-chevron"></i>
+              </div>
+              <div class="capsule-connector"></div>
+              <div class="capsule-item">
+                <div class="capsule-icon-wrap"><i data-lucide="calendar" class="capsule-icon"></i></div>
+                <div class="capsule-body">
+                  <span class="capsule-label">Departure</span>
+                  <select id="departureInput" class="capsule-select">
+                    <option value="6:00 PM, Today" selected>6:00 PM, Today</option>
+                    <option value="8:00 PM, Today">8:00 PM, Today</option>
+                    <option value="11:00 PM, Today">11:00 PM, Today (Safest)</option>
+                    <option value="6:00 AM, Tomorrow">6:00 AM, Tomorrow</option>
+                  </select>
+                </div>
+                <i data-lucide="chevron-down" class="capsule-chevron"></i>
+              </div>
+              <div class="capsule-connector"></div>
+              <div class="capsule-item">
+                <div class="capsule-icon-wrap"><i data-lucide="car" class="capsule-icon"></i></div>
+                <div class="capsule-body">
+                  <span class="capsule-label">Mode</span>
+                  <select id="modeInput" class="capsule-select">
+                    <option value="Road" selected>Road</option>
+                    <option value="Highway">Expressway</option>
+                    <option value="Commercial">Heavy Vehicle</option>
+                  </select>
+                </div>
+                <i data-lucide="chevron-down" class="capsule-chevron"></i>
+              </div>
+            </div>
+
+            <button type="button" class="btn-analyze-full" id="analyzeRiskBtn">
+              <span class="btn-analyze-center">
+                <i data-lucide="trending-up" class="btn-trend-icon"></i>
+                <span>Analyze Route Risk</span>
+              </span>
+              <i data-lucide="arrow-right" class="btn-arrow-icon"></i>
+            </button>
+          </div>
+
+          <!-- Feature Cards Grid -->
+          <div class="feature-cards-grid-exact">
+            <div class="feature-card-clean" data-target="page-time-analysis">
+              <div class="feature-icon-circle"><i data-lucide="clock" class="feature-circle-icon"></i></div>
+              <div class="feature-text-block">
+                <h4 class="feature-heading">Time Analysis</h4>
+                <p class="feature-subheading">Compare risk by departure time</p>
+              </div>
+              <i data-lucide="arrow-right" class="feature-card-arrow"></i>
+            </div>
+            <div class="feature-card-clean" data-target="page-route-map">
+              <div class="feature-icon-circle"><i data-lucide="git-branch" class="feature-circle-icon"></i></div>
+              <div class="feature-text-block">
+                <h4 class="feature-heading">Explore Routes</h4>
+                <p class="feature-subheading">View alternate routes and compare</p>
+              </div>
+              <i data-lucide="arrow-right" class="feature-card-arrow"></i>
+            </div>
+            <div class="feature-card-clean" data-target="page-time-analysis">
+              <div class="feature-icon-circle"><i data-lucide="cloud-lightning" class="feature-circle-icon"></i></div>
+              <div class="feature-text-block">
+                <h4 class="feature-heading">Live Alerts</h4>
+                <p class="feature-subheading">Stay updated with real-time alerts</p>
+              </div>
+              <i data-lucide="arrow-right" class="feature-card-arrow"></i>
+            </div>
+            <div class="feature-card-clean" data-target="page-offline-center">
+              <div class="feature-icon-circle">
+                <svg class="feature-circle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+                  <polyline points="8 14 12 18 16 14"/>
+                  <line x1="12" y1="10" x2="12" y2="18"/>
+                </svg>
+              </div>
+              <div class="feature-text-block">
+                <h4 class="feature-heading">Offline Safety Kit</h4>
+                <p class="feature-subheading">Access essential info without internet</p>
+              </div>
+              <i data-lucide="arrow-right" class="feature-card-arrow"></i>
+            </div>
+          </div>
+        </section>
+
+        <!-- SCREEN 02: TIME ANALYSIS -->
+        <section class="screen-view" id="page-time-analysis">
+          <div class="live-alert-banner" id="liveAlertBanner">
+            <div class="alert-banner-left">
+              <div class="alert-icon-square"><i data-lucide="alert-triangle"></i></div>
+              <div class="alert-banner-content">
+                <span class="alert-title-tag">LIVE ALERT:</span>
+                <span class="alert-message">Confirmed road closure in Zone C. Risk delta detected. Rerouting recommended.</span>
+              </div>
+            </div>
+            <div class="alert-banner-right">
+              <button class="btn-dark-red" id="viewAlternateRoutesBtn">
+                <span>View Alternate Routes</span>
+                <i data-lucide="arrow-right"></i>
+              </button>
+              <button class="alert-dismiss-btn" id="dismissAlertBtn"><i data-lucide="x"></i></button>
+            </div>
+          </div>
+
+          <div class="section-sub-bar">
+            <div class="section-title-wrap">
+              <i data-lucide="clock" class="section-icon-indigo"></i>
+              <div>
+                <h2 class="section-heading">Time-Aware Hazard Windows</h2>
+                <p class="section-subtext">Risk evaluated by estimated time of arrival (ETA) per zone.</p>
+              </div>
+            </div>
+            <button class="link-btn-how" id="howThisWorksBtn"><i data-lucide="help-circle"></i><span>How this works</span></button>
+          </div>
+
+          <div class="time-comparison-container">
+            <div class="time-window-card card-risk-high">
+              <div class="window-card-header">
+                <div class="window-time-badge">
+                  <i data-lucide="calendar" class="window-calendar-icon"></i>
+                  <div>
+                    <span class="window-label">Departure:</span>
+                    <strong class="window-time-val">6:00 PM</strong>
+                  </div>
+                </div>
+                <div class="window-status-pill pill-danger">Higher exposure to peak hazards</div>
+              </div>
+
+              <div class="zone-timeline-list">
+                <div class="zone-row">
+                  <div class="zone-tag-col"><span class="zone-name">Zone A</span></div>
+                  <div class="zone-eta-col"><span class="eta-label">ETA 6:20 PM</span></div>
+                  <div class="zone-risk-col"><span class="risk-pill-inline pill-warning-soft"><span class="status-dot dot-amber"></span>Moderate rain</span></div>
+                </div>
+                <div class="zone-row">
+                  <div class="zone-tag-col"><span class="zone-name">Zone B</span></div>
+                  <div class="zone-eta-col"><span class="eta-label">ETA 6:45 PM</span></div>
+                  <div class="zone-risk-col"><span class="risk-pill-inline pill-danger-soft"><span class="status-dot dot-red"></span>Heavy rain beginning</span></div>
+                </div>
+                <div class="zone-row zone-row-highlight-danger">
+                  <div class="zone-tag-col"><span class="zone-name font-bold">Zone C</span></div>
+                  <div class="zone-eta-col"><span class="eta-label font-bold">ETA 7:15 PM</span></div>
+                  <div class="zone-risk-col"><span class="risk-pill-inline pill-danger-solid"><i data-lucide="alert-octagon" class="inline-danger-icon"></i>PEAK - Landslide risk High</span></div>
+                </div>
+                <div class="zone-row">
+                  <div class="zone-tag-col"><span class="zone-name">Zone D</span></div>
+                  <div class="zone-eta-col"><span class="eta-label">ETA 7:50 PM</span></div>
+                  <div class="zone-risk-col"><span class="risk-pill-inline pill-warning-soft"><span class="status-dot dot-amber"></span>Moderate rain, declining</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="vs-badge-wrapper"><div class="vs-circle">VS</div></div>
+
+            <div class="time-window-card card-risk-safe">
+              <div class="window-card-header">
+                <div class="window-time-badge">
+                  <i data-lucide="calendar" class="window-calendar-icon"></i>
+                  <div>
+                    <span class="window-label">Departure:</span>
+                    <strong class="window-time-val">11:00 PM</strong>
+                  </div>
+                </div>
+                <div class="window-status-pill pill-success">Route past hazard window</div>
+              </div>
+
+              <div class="zone-timeline-list">
+                <div class="zone-row">
+                  <div class="zone-tag-col"><span class="zone-name">Zone A</span></div>
+                  <div class="zone-eta-col"><span class="eta-label">ETA 11:20 PM</span></div>
+                  <div class="zone-risk-col"><span class="risk-pill-inline pill-success-soft"><span class="status-dot dot-green"></span>Light rain</span></div>
+                </div>
+                <div class="zone-row">
+                  <div class="zone-tag-col"><span class="zone-name">Zone B</span></div>
+                  <div class="zone-eta-col"><span class="eta-label">ETA 11:45 PM</span></div>
+                  <div class="zone-risk-col"><span class="risk-pill-inline pill-success-soft"><span class="status-dot dot-green"></span>Rain easing</span></div>
+                </div>
+                <div class="zone-row">
+                  <div class="zone-tag-col"><span class="zone-name">Zone C</span></div>
+                  <div class="zone-eta-col"><span class="eta-label">ETA 12:15 AM</span></div>
+                  <div class="zone-risk-col"><span class="risk-pill-inline pill-warning-soft"><span class="status-dot dot-amber"></span>Peak passed - risk reduced</span></div>
+                </div>
+                <div class="zone-row">
+                  <div class="zone-tag-col"><span class="zone-name">Zone D</span></div>
+                  <div class="zone-eta-col"><span class="eta-label">ETA 12:50 AM</span></div>
+                  <div class="zone-risk-col"><span class="risk-pill-inline pill-success-soft"><span class="status-dot dot-green"></span>Clear</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout-card-blue">
+            <div class="callout-content">
+              <i data-lucide="info" class="callout-icon"></i>
+              <span class="callout-text">Comparing ETAs helps you choose the safest departure time by avoiding peak hazard windows.</span>
+            </div>
+            <button class="callout-learn-btn" id="timeLearnMoreBtn"><span>Learn More</span><i data-lucide="arrow-right"></i></button>
+          </div>
+
+          <div class="page-footer-meta">
+            <div class="meta-left">
+              <span>All times are local</span>
+              <span class="meta-sep">•</span>
+              <span>Data updated just now</span>
+            </div>
+            <div class="meta-right">
+              <span class="confidence-badge">
+                <i data-lucide="shield-check" class="confidence-icon text-emerald"></i>
+                Confidence in analysis: <strong>High</strong>
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <!-- SCREEN 03: ROUTE MAP -->
+        <section class="screen-view" id="page-route-map">
+          <div class="route-map-layout">
+            <div class="map-main-column">
+              <div class="map-card-container">
+                <div class="map-header-bar">
+                  <div class="map-title-wrap">
+                    <i data-lucide="map-pin" class="text-indigo"></i>
+                    <div>
+                      <h2 class="map-heading">Interactive Route Map</h2>
+                      <p class="map-subheading">Explores risk per segment/zone between Coimbatore and Palakkad.</p>
+                    </div>
+                  </div>
+                  <div class="map-layer-controls">
+                    <div class="dropdown-wrapper">
+                      <button class="btn-outline-sm" id="mapLayersDropdownBtn">
+                        <i data-lucide="layers"></i>
+                        <span>Map Layers</span>
+                        <i data-lucide="chevron-down"></i>
+                      </button>
+                      <div class="layer-menu" id="layerMenu">
+                        <label class="layer-option"><input type="checkbox" checked id="layerRoutes"> Multi-Route Overlay</label>
+                        <label class="layer-option"><input type="checkbox" checked id="layerHazards"> Hazard Zones & Sensors</label>
+                        <label class="layer-option"><input type="checkbox" checked id="layerTerrain"> Terrain Topography</label>
+                        <label class="layer-option"><input type="checkbox" checked id="layerSafeHavens"> Safe Haven Points</label>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="map-view-wrapper">
+                  <div id="leafletMap" class="leaflet-map-canvas"></div>
+                  <div class="map-legend-overlay">
+                    <div class="legend-item" id="legendRoute1" onclick="selectRoute(1)">
+                      <span class="legend-color-line color-green"></span>
+                      <span>Route 1 (Recommended)</span>
+                    </div>
+                    <div class="legend-item" id="legendRoute2" onclick="selectRoute(2)">
+                      <span class="legend-color-line color-orange"></span>
+                      <span>Route 2 (Moderate Risk)</span>
+                    </div>
+                    <div class="legend-item" id="legendRoute3" onclick="selectRoute(3)">
+                      <span class="legend-color-line color-red"></span>
+                      <span>Route 3 (High-Risk)</span>
+                    </div>
+                  </div>
+                  <div class="map-hazard-pin-box" id="hazardPinZoneC">
+                    <div class="hazard-pin-header">
+                      <i data-lucide="alert-octagon" class="pin-hazard-icon"></i>
+                      <strong>Zone C: High Risk</strong>
+                    </div>
+                    <p class="hazard-pin-desc">Landslide & Road Closure reports</p>
+                  </div>
+                </div>
+
+                <div class="map-summary-bar">
+                  <div class="summary-metric-group">
+                    <div class="summary-metric-title"><i data-lucide="compass"></i><span>Route Summary</span></div>
+                    <div class="summary-stats-row">
+                      <div class="stat-item">
+                        <span class="stat-label">Total Distance</span>
+                        <strong class="stat-value">78 - 92 km</strong>
+                      </div>
+                      <div class="stat-item">
+                        <span class="stat-label">Best ETA</span>
+                        <strong class="stat-value text-emerald">2h 15m</strong>
+                      </div>
+                      <div class="stat-item">
+                        <span class="stat-label">Safest Option</span>
+                        <strong class="stat-value text-indigo">Route 1</strong>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="summary-insights-group">
+                    <div class="summary-metric-title"><i data-lucide="lightbulb"></i><span>Key Insights</span></div>
+                    <ul class="insights-list">
+                      <li><strong>Route 1</strong> avoids landslide-prone passes near Aliyar/Attappadi.</li>
+                      <li><strong>Route 3</strong> has a confirmed road closure in <strong>Zone C</strong>.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="map-sidebar-column">
+              <div class="card ranking-card">
+                <div class="ranking-card-header">
+                  <h3 class="ranking-title">Alternate Route Ranking</h3>
+                  <p class="ranking-subtitle">Ranked by overall route utility score</p>
+                </div>
+                <div class="route-ranking-list">
+                  <div class="route-card-item route-card-recommended active" id="routeCard1" onclick="selectRoute(1)">
+                    <div class="route-card-top">
+                      <div class="route-rank-badge badge-rank-1">1</div>
+                      <div class="route-card-title-wrap">
+                        <h4 class="route-item-title">Route 1 (Recommended)</h4>
+                        <p class="route-item-via">Via Coimbatore → Mettupalayam → Pollachi → Palakkad Hwy</p>
+                      </div>
+                      <div class="route-eta-badge"><span class="route-eta-label">ETA</span><span class="route-eta-time">2h 15m</span></div>
+                    </div>
+                    <div class="route-card-bottom-tags">
+                      <span class="route-status-chip chip-low-risk"><span class="chip-dot dot-green"></span>Low Risk</span>
+                      <span class="route-status-chip chip-clean"><i data-lucide="check" class="chip-icon"></i>0 risks of road delays</span>
+                    </div>
+                  </div>
+
+                  <div class="route-card-item route-card-moderate" id="routeCard2" onclick="selectRoute(2)">
+                    <div class="route-card-top">
+                      <div class="route-rank-badge badge-rank-2">2</div>
+                      <div class="route-card-title-wrap">
+                        <h4 class="route-item-title">Route 2 (Moderate Risk)</h4>
+                        <p class="route-item-via">Via Pollachi → Walayar → Palakkad Road</p>
+                      </div>
+                      <div class="route-eta-badge"><span class="route-eta-label">ETA</span><span class="route-eta-time">2h 55m</span></div>
+                    </div>
+                    <div class="route-card-bottom-tags">
+                      <span class="route-status-chip chip-mod-risk"><span class="chip-dot dot-amber"></span>Moderate Risk</span>
+                      <span class="route-status-chip chip-delay"><i data-lucide="clock" class="chip-icon"></i>+40 min delay</span>
+                    </div>
+                  </div>
+
+                  <div class="route-card-item route-card-high-risk" id="routeCard3" onclick="selectRoute(3)">
+                    <div class="route-card-top">
+                      <div class="route-rank-badge badge-rank-3">3</div>
+                      <div class="route-card-title-wrap">
+                        <h4 class="route-item-title">Route 3 (High-Risk)</h4>
+                        <p class="route-item-via">Via Anamalai Ghat Road (Original Route)</p>
+                      </div>
+                      <div class="route-eta-badge"><span class="route-eta-label">ETA</span><span class="route-eta-time text-red">3h 15m</span></div>
+                    </div>
+                    <div class="route-card-bottom-tags">
+                      <span class="route-status-chip chip-high-risk"><span class="chip-dot dot-red"></span>High Risk</span>
+                      <span class="route-status-chip chip-disrupted"><i data-lucide="alert-triangle" class="chip-icon"></i>Disrupted Zone (C)</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SCREEN 04: OFFLINE CENTER -->
+        <section class="screen-view" id="page-offline-center">
+          <div class="offline-warning-banner">
+            <div class="offline-banner-left">
+              <i data-lucide="cloud-off" class="offline-cloud-icon"></i>
+              <div>
+                <strong>OFFLINE MODE: Connectivity loss detected.</strong>
+                <span>Displaying cached safety information and alternate routes.</span>
+              </div>
+            </div>
+            <button class="btn-toggle-offline" id="toggleOfflineSimBtn"><i data-lucide="wifi"></i><span>Simulate Reconnect</span></button>
+          </div>
+
+          <div class="offline-two-col-layout">
+            <div class="offline-left-col">
+              <div class="card offline-card">
+                <div class="offline-card-header">
+                  <div>
+                    <h3 class="offline-sec-title">Cached Route Status</h3>
+                    <span class="offline-timestamp"><i data-lucide="clock" class="time-micro-icon"></i>Last saved: 18 min ago</span>
+                  </div>
+                </div>
+                <div class="cached-zones-flow">
+                  <div class="flow-zone-pill pill-zone-green"><span class="flow-zone-title">Zone A</span><span class="flow-zone-status">Low Risk</span></div>
+                  <i data-lucide="arrow-right" class="flow-arrow"></i>
+                  <div class="flow-zone-pill pill-zone-amber"><span class="flow-zone-title">Zone B</span><span class="flow-zone-status">Moderate Risk</span></div>
+                  <i data-lucide="arrow-right" class="flow-arrow"></i>
+                  <div class="flow-zone-pill pill-zone-red"><span class="flow-zone-title">Zone C</span><span class="flow-zone-status">High Risk</span></div>
+                  <i data-lucide="arrow-right" class="flow-arrow"></i>
+                  <div class="flow-zone-pill pill-zone-amber"><span class="flow-zone-title">Zone D</span><span class="flow-zone-status">Moderate Risk</span></div>
+                </div>
+                <div class="cached-notice-box"><i data-lucide="alert-circle" class="notice-icon"></i><p>This route data is cached. Risk levels may be outdated.</p></div>
+              </div>
+
+              <div class="card offline-card">
+                <div class="offline-card-header">
+                  <div>
+                    <h3 class="offline-sec-title">Emergency Information</h3>
+                    <p class="card-subtext">Access critical info while offline</p>
+                  </div>
+                </div>
+                <div class="emergency-checklist">
+                  <div class="emergency-row">
+                    <div class="emergency-info-left"><i data-lucide="phone-call" class="emergency-item-icon text-indigo"></i><div><strong>Local Emergency Contacts</strong><p class="emergency-subtext">Police, Ambulance, Obstacle Helpline</p></div></div>
+                    <span class="status-badge-cached"><i data-lucide="check" class="badge-check"></i>Cached</span>
+                  </div>
+                  <div class="emergency-row">
+                    <div class="emergency-info-left"><i data-lucide="shield-plus" class="emergency-item-icon text-indigo"></i><div><strong>Safe Haven Points</strong><p class="emergency-subtext">Nearby shelters, relief centers, hospitals</p></div></div>
+                    <span class="status-badge-cached"><i data-lucide="check" class="badge-check"></i>Cached</span>
+                  </div>
+                  <div class="emergency-row">
+                    <div class="emergency-info-left"><i data-lucide="map" class="emergency-item-icon text-indigo"></i><div><strong>Offline Map Availability</strong><p class="emergency-subtext">Downloaded maps for your region</p></div></div>
+                    <span class="status-badge-cached badge-available"><i data-lucide="check" class="badge-check"></i>Available</span>
+                  </div>
+                </div>
+                <div class="emergency-action-wrap">
+                  <button class="btn-outline-full" id="refreshDataBtn"><i data-lucide="refresh-cw"></i><span>Refresh All Data</span></button>
+                </div>
+              </div>
+            </div>
+
+            <div class="offline-right-col">
+              <div class="card offline-card">
+                <div class="offline-card-header">
+                  <div>
+                    <h3 class="offline-sec-title">Offline Tools & Guidance</h3>
+                    <p class="card-subtext">Helpful resources available without internet</p>
+                  </div>
+                </div>
+                <div class="offline-tools-grid">
+                  <div class="offline-tool-item" onclick="openOfflineModal('safety')">
+                    <div class="tool-icon-wrap"><i data-lucide="book-open" class="tool-icon text-indigo"></i></div>
+                    <h4 class="tool-title">Offline Safety Guide</h4>
+                    <p class="tool-desc">Best practices and safety tips for travelers</p>
+                    <button class="tool-link-btn"><span>View Guide</span><i data-lucide="arrow-right"></i></button>
+                  </div>
+                  <div class="offline-tool-item" onclick="openOfflineModal('weather')">
+                    <div class="tool-icon-wrap"><i data-lucide="cloud-sun" class="tool-icon text-indigo"></i></div>
+                    <h4 class="tool-title">Weather Snapshot</h4>
+                    <p class="tool-desc">Last cached weather for your route</p>
+                    <button class="tool-link-btn"><span>View Snapshot</span><i data-lucide="arrow-right"></i></button>
+                  </div>
+                  <div class="offline-tool-item" onclick="openOfflineModal('legend')">
+                    <div class="tool-icon-wrap"><i data-lucide="alert-triangle" class="tool-icon text-indigo"></i></div>
+                    <h4 class="tool-title">Risk Legend</h4>
+                    <p class="tool-desc">Understand risk levels and their meanings</p>
+                    <button class="tool-link-btn"><span>View Legend</span><i data-lucide="arrow-right"></i></button>
+                  </div>
+                  <div class="offline-tool-item" onclick="openOfflineModal('action')">
+                    <div class="tool-icon-wrap"><i data-lucide="check-square" class="tool-icon text-indigo"></i></div>
+                    <h4 class="tool-title">Action Checklist</h4>
+                    <p class="tool-desc">Step-by-step action plan for high-risk situations</p>
+                    <button class="tool-link-btn"><span>View Checklist</span><i data-lucide="arrow-right"></i></button>
+                  </div>
+                  <div class="offline-tool-item" onclick="openOfflineModal('advisory')">
+                    <div class="tool-icon-wrap"><i data-lucide="file-text" class="tool-icon text-indigo"></i></div>
+                    <h4 class="tool-title">Travel Advisory Notes</h4>
+                    <p class="tool-desc">Important notes and advisories cached</p>
+                    <button class="tool-link-btn"><span>View Notes</span><i data-lucide="arrow-right"></i></button>
+                  </div>
+                  <div class="offline-tool-item" onclick="openOfflineModal('download')">
+                    <div class="tool-icon-wrap"><i data-lucide="download-cloud" class="tool-icon text-indigo"></i></div>
+                    <h4 class="tool-title">Download More Data</h4>
+                    <p class="tool-desc">Update maps and resources online</p>
+                    <button class="tool-link-btn"><span>Manage Downloads</span><i data-lucide="arrow-right"></i></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SCREEN 05: HISTORY -->
+        <section class="screen-view" id="page-history">
+          <div class="history-hero-header">
+            <h2 class="history-main-title">Travel History & Incident Validation</h2>
+            <p class="history-main-subtitle">Review past predictions against actual ground truth to calibrate system accuracy.</p>
+          </div>
+
+          <div class="history-top-grid">
+            <div class="metric-card">
+              <div class="metric-card-content">
+                <span class="metric-card-label">Total Trips Analyzed</span>
+                <div class="metric-number-display">142</div>
+                <span class="metric-footnote">All trips processed by the system</span>
+              </div>
+              <div class="metric-icon-bubble bubble-purple"><i data-lucide="route"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-card-content">
+                <span class="metric-card-label">Target False Negative Rate</span>
+                <div class="metric-number-display text-emerald">&lt; 10%</div>
+                <div class="metric-badge-row"><span class="metric-chip chip-success">Target passed!</span></div>
+              </div>
+              <div class="metric-icon-bubble bubble-emerald"><i data-lucide="target"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-card-content">
+                <span class="metric-card-label">Target False Positive Rate</span>
+                <div class="metric-number-display text-amber">&lt; 30%</div>
+                <div class="metric-badge-row"><span class="metric-chip chip-warning">38% target</span></div>
+              </div>
+              <div class="metric-icon-bubble bubble-amber"><i data-lucide="alert-circle"></i></div>
+            </div>
+            <div class="roadmap-card">
+              <div class="roadmap-header">
+                <div class="roadmap-title-row">
+                  <i data-lucide="calendar" class="text-indigo"></i>
+                  <div>
+                    <h3 class="roadmap-title">30-Day Post-Hackathon Roadmap</h3>
+                    <p class="roadmap-subtitle">Our plan to continuously improve accuracy</p>
+                  </div>
+                </div>
+              </div>
+              <div class="roadmap-steps">
+                <div class="roadmap-step-item"><span class="step-num">1</span><span class="step-text">Collect dataset calibration logs</span></div>
+                <div class="roadmap-step-item">
+                  <span class="step-num">2</span>
+                  <div class="step-content-full">
+                    <span class="step-text">Tune susceptibility weights (70% training / 30% testing)</span>
+                    <div class="roadmap-progress-bar">
+                      <div class="prog-segment prog-train" style="width: 70%;"><span>Training (70%)</span></div>
+                      <div class="prog-segment prog-test" style="width: 30%;"><span>Testing (30%)</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="roadmap-btn-wrap">
+                <button class="btn-indigo-full" id="viewFullRoadmapBtn"><span>View Full Roadmap</span><i data-lucide="arrow-right"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card history-table-card">
+            <div class="history-table-header">
+              <div>
+                <h3 class="table-sec-title">Historical Trip Log</h3>
+                <p class="card-subtext">Tracking predicted risk against actual outcomes</p>
+              </div>
+              <div class="table-actions-group">
+                <div class="search-input-wrap">
+                  <i data-lucide="search" class="search-icon"></i>
+                  <input type="text" id="historySearchInput" placeholder="Search routes..." class="search-input" />
+                </div>
+                <button class="btn-table-action" id="filterDateBtn"><i data-lucide="calendar"></i><span>Filter by Date</span></button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="history-table" id="historyTable">
+                <thead>
+                  <tr><th>Date & Route</th><th>Predicted Risk</th><th>Actual Outcome</th><th>System Accuracy</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="history-row">
+                    <td><div class="route-date-cell"><strong class="trip-date">10 Aug 2024</strong><span class="trip-route">Coimbatore to Palakkad</span></div></td>
+                    <td><span class="risk-badge-solid badge-red">RED RISK</span></td>
+                    <td><div class="outcome-cell"><strong class="outcome-main">Confirmed Landslide in Zone C</strong><span class="outcome-meta">Heavy rain</span></div></td>
+                    <td><span class="accuracy-badge badge-accuracy-validated"><i data-lucide="check-circle" class="accuracy-icon"></i>Validated</span></td>
+                  </tr>
+                  <tr class="history-row">
+                    <td><div class="route-date-cell"><strong class="trip-date">04 Aug 2024</strong><span class="trip-route">Palakkad to Wayanad</span></div></td>
+                    <td><span class="risk-badge-solid badge-orange">ORANGE RISK</span></td>
+                    <td><div class="outcome-cell"><strong class="outcome-main">Rock Blockage in Zone B</strong><span class="outcome-meta">Moderate rain</span></div></td>
+                    <td><span class="accuracy-badge badge-accuracy-validated"><i data-lucide="check-circle" class="accuracy-icon"></i>Validated</span></td>
+                  </tr>
+                  <tr class="history-row">
+                    <td><div class="route-date-cell"><strong class="trip-date">02 Aug 2024</strong><span class="trip-route">Coimbatore to Ooty</span></div></td>
+                    <td><span class="risk-badge-solid badge-yellow">MODERATE RISK</span></td>
+                    <td><div class="outcome-cell"><strong class="outcome-main">No Disruption</strong><span class="outcome-meta">Light rain</span></div></td>
+                    <td><span class="accuracy-badge badge-accuracy-calib"><i data-lucide="alert-circle" class="accuracy-icon"></i>Calibration Needed</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SCREEN 06: SETTINGS -->
+        <section class="screen-view" id="page-settings">
+          <div class="settings-page-layout">
+            <div class="settings-subnav-col">
+              <div class="subnav-header">
+                <h3 class="subnav-title">Settings</h3>
+                <p class="subnav-subtitle">Manage your profile and system settings</p>
+              </div>
+              <div class="settings-menu-list">
+                <button class="settings-nav-item active" data-target="settings-account"><i data-lucide="user"></i><span>Account</span></button>
+                <button class="settings-nav-item" data-target="settings-notifications"><i data-lucide="bell"></i><span>Notifications</span></button>
+                <button class="settings-nav-item" data-target="settings-safety-risk"><i data-lucide="shield-check"></i><span>Safety & Risk</span></button>
+                <button class="settings-nav-item" data-target="settings-privacy-data"><i data-lucide="lock"></i><span>Privacy & Data</span></button>
+                <button class="settings-nav-item" data-target="settings-preferences"><i data-lucide="sliders"></i><span>Preferences</span></button>
+              </div>
+            </div>
+
+            <div class="settings-main-col">
+              <div class="card settings-content-card" id="settingsContentContainer">
+                
+                <!-- 1. ACCOUNT -->
+                <div class="settings-group-section" id="settings-account">
+                  <div class="settings-header-banner">
+                    <h2 class="settings-main-heading">👤 Account Profile</h2>
+                    <p class="settings-main-subtext">Manage traveler credentials and profile settings.</p>
+                  </div>
+                  <div class="account-profile-card">
+                    <div class="account-profile-header">
+                      <div class="account-avatar-large"><i data-lucide="user"></i></div>
+                      <div class="account-user-meta">
+                        <h4 class="account-user-name">Gokul R</h4>
+                        <span class="account-user-badge">Verified Traveler</span>
+                        <p class="account-user-email">traveler.gokul@gmail.com</p>
+                      </div>
+                      <button class="btn-outline-sm" onclick="showToast('Edit details opened.')">Edit Details</button>
+                    </div>
+                    <div class="account-info-grid">
+                      <div class="account-info-item"><span class="info-label">Mobile</span><strong class="info-val">+91 98765 43210</strong></div>
+                      <div class="account-info-item"><span class="info-label">Emergency Contact</span><strong class="info-val">+91 98430 11223</strong></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 2. NOTIFICATIONS -->
+                <div class="settings-group-section" id="settings-notifications">
+                  <div class="settings-header-banner">
+                    <h2 class="settings-main-heading">🔔 Notifications</h2>
+                    <p class="settings-main-subtext">Configure hazard warnings and audio feedback options.</p>
+                  </div>
+                  <div class="settings-sections-list">
+                    <div class="setting-item-block">
+                      <div class="setting-item-header">
+                        <div class="setting-item-icon-tag"><i data-lucide="bell" style="width:16px;height:16px;"></i></div>
+                        <div class="setting-item-info">
+                          <h4 class="setting-title">Push Notifications</h4>
+                          <p class="setting-description">Instant alerts when imminent road hazards are detected on active trips.</p>
+                        </div>
+                        <div class="setting-toggle-col"><label class="switch"><input type="checkbox" checked onchange="showToast('Alerts updated.')"><span class="slider-round"></span></label></div>
+                      </div>
+                    </div>
+                    <div class="setting-item-block">
+                      <div class="setting-item-header">
+                        <div class="setting-item-icon-tag"><i data-lucide="volume-2" style="width:16px;height:16px;"></i></div>
+                        <div class="setting-item-info">
+                          <h4 class="setting-title">Hazard Warning Audio Chimes</h4>
+                          <p class="setting-description">Play audio warnings when approaching high-risk zones.</p>
+                        </div>
+                        <div class="setting-toggle-col"><label class="switch"><input type="checkbox" checked onchange="showToast('Chimes updated.')"><span class="slider-round"></span></label></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 3. SAFETY & RISK -->
+                <div class="settings-group-section" id="settings-safety-risk">
+                  <div class="settings-header-banner">
+                    <h2 class="settings-main-heading">🛡️ Safety & Risk Governance</h2>
+                    <p class="settings-main-subtext">Calibrate acceptable safety margins and alert thresholds.</p>
+                  </div>
+                  <div class="settings-sections-list">
+                    <div class="setting-item-block">
+                      <div class="setting-item-header">
+                        <div class="setting-item-icon-tag">A</div>
+                        <div class="setting-item-info">
+                          <div class="setting-title-row"><h4 class="setting-title">The 'No-Go' Trigger</h4><span class="setting-tag-danger">Critical Limit</span></div>
+                          <p class="setting-description">Pause analysis formula if &gt;= 2 false negatives occur in 30 days.</p>
+                        </div>
+                        <div class="setting-side-icon"><i data-lucide="shield-alert" class="watermark-icon text-indigo"></i></div>
+                      </div>
+                    </div>
+                    <div class="setting-item-block">
+                      <div class="setting-item-header">
+                        <div class="setting-item-icon-tag">B</div>
+                        <div class="setting-item-info">
+                          <div class="setting-title-row"><h4 class="setting-title">Data Confidence Limits</h4></div>
+                          <div class="slider-control-row">
+                            <span class="slider-text-label">Acceptable UNKNOWN state ratio:</span>
+                            <span class="slider-val-badge" id="confidenceValDisplay">20%</span>
+                          </div>
+                          <div class="slider-input-wrap">
+                            <input type="range" id="confidenceSlider" min="5" max="50" value="20" class="custom-range-slider" />
+                          </div>
+                        </div>
+                        <div class="setting-side-icon"><i data-lucide="bar-chart-2" class="watermark-icon text-indigo"></i></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 4. PRIVACY & DATA -->
+                <div class="settings-group-section" id="settings-privacy-data">
+                  <div class="settings-header-banner">
+                    <h2 class="settings-main-heading">🔒 Privacy & Data</h2>
+                    <p class="settings-main-subtext">Manage telemetry settings, route logging, and data retention windows.</p>
+                  </div>
+                  <div class="settings-sections-list">
+                    <div class="setting-item-block">
+                      <div class="setting-item-header">
+                        <div class="setting-item-icon-tag">E</div>
+                        <div class="setting-item-info">
+                          <h4 class="setting-title">Real-Time Proximity Monitoring</h4>
+                          <p class="setting-description">Updates route risk, recalculates ETAs, and triggers warning alerts in real-time.</p>
+                        </div>
+                        <div class="setting-toggle-col"><label class="switch"><input type="checkbox" id="realtimeMonitoringToggle" checked><span class="slider-round"></span></label></div>
+                        <div class="setting-side-icon"><i data-lucide="map-pin" class="watermark-icon text-indigo"></i></div>
+                      </div>
+                    </div>
+                    <div class="setting-item-block">
+                      <div class="setting-item-header">
+                        <div class="setting-item-icon-tag">F</div>
+                        <div class="setting-item-info">
+                          <h4 class="setting-title">Data Retention Period</h4>
+                          <div class="retention-select-wrap">
+                            <select id="dataRetentionSelect" class="custom-select-inline">
+                              <option value="3">3 Months</option>
+                              <option value="6">6 Months</option>
+                              <option value="12" selected>12 Months</option>
+                              <option value="forever">Indefinitely</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="setting-side-icon"><i data-lucide="database" class="watermark-icon text-indigo"></i></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 5. PREFERENCES -->
+                <div class="settings-group-section" id="settings-preferences">
+                  <div class="settings-header-banner">
+                    <h2 class="settings-main-heading">⚙️ Preferences</h2>
+                    <p class="settings-main-subtext">Configure visual styles, rendering modes, and measurement units.</p>
+                  </div>
+                  <div class="settings-sections-list">
+                    <div class="setting-item-block">
+                      <div class="setting-item-header">
+                        <div class="setting-item-icon-tag"><i data-lucide="compass" style="width:16px;height:16px;"></i></div>
+                        <div class="setting-item-info">
+                          <h4 class="setting-title">Distance Metric</h4>
+                          <div class="segmented-control-wrap">
+                            <button class="seg-btn active" onclick="showToast('Units set to km')">Kilometers (km)</button>
+                            <button class="seg-btn" onclick="showToast('Units set to mi')">Miles (mi)</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="offlineModalBackdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-row"><i data-lucide="info" class="modal-title-icon text-indigo"></i><h3 class="modal-title" id="offlineModalTitle">Guidance</h3></div>
+        <button class="modal-close-btn" id="closeModalBtn">&times;</button>
+      </div>
+      <div class="modal-body" id="offlineModalBody"></div>
+      <div class="modal-footer"><button class="btn-primary-sm" id="modalActionBtn">Understood</button></div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="app.js"></script>
+</body>
+</html>
