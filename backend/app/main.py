@@ -14,6 +14,7 @@ from app.api import trips
 from app.api import route_segments
 from app.api import risk_assessments
 from app.api import alerts
+from app.api import route_ranking
 
 app = FastAPI(
     title="AI Travel Risk Intelligence System - Backend",
@@ -34,7 +35,7 @@ app.include_router(trips.router)
 app.include_router(route_segments.router)
 app.include_router(risk_assessments.router)
 app.include_router(alerts.router)
-
+app.include_router(route_ranking.router)
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc: HTTPException):

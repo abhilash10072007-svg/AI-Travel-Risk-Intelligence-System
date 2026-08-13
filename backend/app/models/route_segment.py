@@ -5,7 +5,7 @@ NOT used yet - reserved for the route segmentation module.
 from sqlalchemy import Column, BigInteger, Integer, Text, DateTime, ForeignKey
 
 from app.db.database import Base
-from app.services.weather import fetch_current_rainfall_band
+
 
 class RouteSegment(Base):
     __tablename__ = "route_segments"
