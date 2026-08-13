@@ -129,3 +129,36 @@ def calculate_risk(rainfall_band, weather, terrain):
         "total_score": total_score,
         "risk_level": risk_level
     }
+
+
+def detect_terrain_type(location_name: str) -> str:
+    """
+    Automatically infers terrain classification for Tamil Nadu regions
+    so a normal user doesn't need to specify technical terrain types.
+    """
+    name = (location_name or "").strip().lower()
+
+    if any(k in name for k in ["ooty", "kodaikanal", "valparai", "zone c", "ghat"]):
+        return "steep"
+    elif any(k in name for k in ["nilgiris", "yercaud", "coonoor", "bodimettu", "kolli"]):
+        return "hilly"
+    elif any(k in name for k in ["palakkad", "pollachi", "zone b", "dindigul", "hosur"]):
+        return "undulating"
+    else:
+        return "flat"
+
+
+def generate_user_advisory(total_score: int, risk_level: str, weather: str, terrain: str) -> str:
+    """
+    Generates easy-to-understand, plain-English travel advisory for normal users.
+    """
+    if risk_level == "GREEN":
+        return "Safe travel conditions ahead. Enjoy your journey!"
+    elif risk_level == "YELLOW":
+        if "rain" in weather.lower() or "drizzle" in weather.lower():
+            return f"Caution: Wet roads and {terrain} terrain detected. Drive slowly and keep safe braking distance."
+        return f"Moderate travel risk detected due to {terrain} terrain. Drive carefully."
+    else:  # RED
+        if "thunderstorm" in weather.lower() or "heavy rain" in weather.lower():
+            return "Severe hazard warning! Heavy rainfall and harsh weather on steep roads. Delay non-essential travel if possible."
+        return "High risk route conditions! Landslide/flooding potential on hilly roads. Drive with extreme caution."

@@ -15,11 +15,12 @@ from app.api import route_segments
 from app.api import risk_assessments
 from app.api import alerts
 from app.api import route_ranking
+from app.api import riskApi
 
 app = FastAPI(
     title="AI Travel Risk Intelligence System - Backend",
-    description="FastAPI foundation + Firebase authentication + Supabase Postgres + Trip Input API.",
-    version="0.2.0",
+    description="FastAPI foundation + Firebase authentication + Supabase Postgres + Trip Input API + Risk Engine.",
+    version="0.3.0",
 )
 
 app.add_middleware(
@@ -36,6 +37,7 @@ app.include_router(route_segments.router)
 app.include_router(risk_assessments.router)
 app.include_router(alerts.router)
 app.include_router(route_ranking.router)
+app.include_router(riskApi.router)
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc: HTTPException):
